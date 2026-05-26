@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chetan Coaching — Elite Table Tennis</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;600;700;900&family=Barlow:wght@300;400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+:root {
+  --green: #1a7c3e; --green-bright: #22a855; --gold: #f5c518;
+  --dark: #080c0a; --dark-2: #0f1710; --dark-3: #162019;
+  --text: #e8f0eb; --text-dim: #8aab94;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--dark); color: var(--text); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+#ball-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 1; opacity: 0.12; }
+section, .stats-bar, .motto-bar, .page-divider, footer { position: relative; z-index: 2; }
+
+/* HERO */
+.hero { min-height: 100vh; display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; overflow: hidden; }
+.hero-left {
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 5rem 4vw 5rem 6vw;
+  background: linear-gradient(160deg, var(--dark) 60%, var(--dark-2));
+  position: relative;
+}
+.hero-left::before {
+  content: ''; position: absolute; left: 0; top: 15%; bottom: 15%; width: 4px;
+  background: linear-gradient(180deg, transparent, var(--gold), var(--green-bright), transparent);
+}
+.eyebrow { font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.38em; color: var(--gold); text-transform: uppercase; margin-bottom: 1.1rem; opacity: 0; transform: translateY(16px); animation: fadeUp 0.6s 0.15s forwards; }
+.hero h1 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3.8rem, 7vw, 6.5rem); line-height: 0.88; letter-spacing: 0.02em; margin-bottom: 1.4rem; opacity: 0; transform: translateY(24px); animation: fadeUp 0.7s 0.3s forwards; }
+.hero h1 .outline { -webkit-text-stroke: 2px var(--gold); color: transparent; }
+.hero-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 0.9rem; letter-spacing: 0.18em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 2rem; opacity: 0; transform: translateY(16px); animation: fadeUp 0.6s 0.45s forwards; }
+.hero-badges { display: flex; flex-wrap: wrap; gap: 0.45rem; margin-bottom: 2.5rem; opacity: 0; animation: fadeUp 0.6s 0.6s forwards; }
+.badge { background: rgba(26,124,62,0.15); border: 1px solid rgba(34,168,85,0.35); color: var(--green-bright); font-family: 'Barlow Condensed', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase; padding: 0.3rem 0.7rem; }
+.badge.gold { background: rgba(245,197,24,0.1); border-color: rgba(245,197,24,0.4); color: var(--gold); }
+.contact-block { opacity: 0; animation: fadeUp 0.6s 0.75s forwards; }
+.contact-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; letter-spacing: 0.25em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 0.3rem; }
+.contact-number { font-family: 'Bebas Neue', sans-serif; font-size: clamp(1.8rem, 3.5vw, 2.8rem); color: var(--gold); letter-spacing: 0.1em; line-height: 1; }
+.contact-channels { font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; letter-spacing: 0.2em; color: var(--green-bright); text-transform: uppercase; margin-top: 0.2rem; }
+.hero-right { position: relative; overflow: hidden; min-height: 100vh; }
+.hero-right img { width: 100%; height: 100%; object-fit: cover; object-position: center 15%; display: block; filter: contrast(1.08) saturate(1.1); }
+.hero-right::before { content: ''; position: absolute; inset: 0; background: linear-gradient(to right, var(--dark) 0%, rgba(8,12,10,0.15) 35%, transparent 60%); z-index: 1; }
+.world-tag { position: absolute; bottom: 7%; right: 5%; z-index: 2; background: rgba(8,12,10,0.9); border: 1px solid rgba(245,197,24,0.45); border-left: 3px solid var(--gold); padding: 0.75rem 1.1rem; }
+.world-tag .wt-title { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--gold); letter-spacing: 0.08em; }
+.world-tag .wt-sub { font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; }
+
+/* STATS — 1x gold bold, rest green */
+.stats-bar { background: var(--dark-3); border-top: 1px solid rgba(245,197,24,0.18); border-bottom: 1px solid rgba(34,168,85,0.15); padding: 1.8rem 6vw; display: grid; grid-template-columns: repeat(4,1fr); text-align: center; }
+.stat { padding: 0.8rem; border-right: 1px solid rgba(255,255,255,0.06); opacity: 0; transform: translateY(16px); transition: all 0.5s; }
+.stat:last-child { border-right: none; }
+.stat.visible { opacity: 1; transform: translateY(0); }
+.stat-number { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem,3.5vw,3rem); line-height: 1; margin-bottom: 0.25rem; font-weight: 900; }
+.stat-number.gold { color: var(--gold); text-shadow: 0 0 20px rgba(245,197,24,0.4); }
+.stat-number.green { color: var(--green-bright); }
+.stat-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.65rem; font-weight: 700; letter-spacing: 0.2em; color: var(--text-dim); text-transform: uppercase; }
+
+/* CREDENTIALS */
+.creds { padding: 5rem 6vw; display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; background: linear-gradient(180deg, var(--dark-2), var(--dark)); }
+.section-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.68rem; font-weight: 700; letter-spacing: 0.4em; color: var(--green-bright); text-transform: uppercase; margin-bottom: 0.7rem; display: flex; align-items: center; gap: 0.7rem; }
+.section-label::before { content: ''; width: 1.2rem; height: 2px; background: var(--green-bright); flex-shrink: 0; }
+.creds h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem,3.5vw,3.5rem); line-height: 0.95; margin-bottom: 1.8rem; }
+.timeline { display: flex; flex-direction: column; }
+.titem { display: grid; grid-template-columns: auto 1fr; gap: 1rem; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.05); opacity: 0; transform: translateX(-16px); transition: all 0.5s; }
+.titem.visible { opacity: 1; transform: translateX(0); }
+.tdot { width: 8px; height: 8px; background: var(--gold); border-radius: 50%; margin-top: 0.42rem; flex-shrink: 0; box-shadow: 0 0 8px rgba(245,197,24,0.5); }
+.titem strong { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 1rem; font-weight: 700; color: var(--text); margin-bottom: 0.1rem; }
+.titem span { font-size: 0.8rem; color: var(--text-dim); font-weight: 300; }
+.portrait-wrap { position: relative; }
+.portrait-wrap img { width: 100%; max-width: 400px; height: 500px; object-fit: cover; object-position: center top; display: block; border: 1px solid rgba(34,168,85,0.22); }
+.portrait-label { position: absolute; bottom: 0; left: 0; right: 0; max-width: 400px; background: var(--gold); color: var(--dark); font-family: 'Bebas Neue', sans-serif; font-size: 1rem; letter-spacing: 0.14em; padding: 0.55rem 1rem; text-align: center; }
+
+/* CINEMATIC VIDEO — zoomed OUT, repositioned to show player not table */
+.video-section { position: relative; height: 80vh; overflow: hidden; background: #000; }
+.video-section video {
+  position: absolute;
+  top: 50%; left: 50%;
+  /* Zoomed OUT — scale(1) = natural size, shows full frame */
+  transform: translate(-50%, -50%) scale(1.05);
+  min-width: 100%; min-height: 100%;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  /* Push up so we see player's body not legs/table */
+  object-position: center 25%;
+  filter: brightness(0.6) contrast(1.1) saturate(1.2);
+  opacity: 0; transition: opacity 0.8s ease;
+}
+.video-section video.playing { opacity: 1; }
+.video-section::before {
+  content: ''; position: absolute; inset: 0; z-index: 1;
+  background: radial-gradient(ellipse 90% 90% at 50% 50%, transparent 30%, rgba(8,12,10,0.6) 100%),
+    linear-gradient(180deg, rgba(8,12,10,0.45) 0%, transparent 18%, transparent 78%, rgba(8,12,10,0.8) 100%);
+}
+.video-overlay { position: absolute; inset: 0; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem; }
+.vo-label { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.45em; color: var(--gold); text-transform: uppercase; margin-bottom: 1rem; opacity: 0; transform: translateY(12px); transition: all 0.8s 0.3s; }
+.vo-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(4rem, 10vw, 9rem); line-height: 0.88; color: #fff; text-shadow: 0 4px 40px rgba(0,0,0,0.6); opacity: 0; transform: translateY(20px); transition: all 0.9s 0.5s; }
+.vo-title span { color: var(--gold); }
+.vo-sub { font-family: 'Barlow Condensed', sans-serif; font-size: clamp(0.85rem,1.8vw,1.1rem); letter-spacing: 0.3em; color: rgba(255,255,255,0.7); text-transform: uppercase; margin-top: 1.2rem; opacity: 0; transform: translateY(12px); transition: all 0.7s 0.8s; }
+.video-section.in-view .vo-label,
+.video-section.in-view .vo-title,
+.video-section.in-view .vo-sub { opacity: 1; transform: translateY(0); }
+.vline-top, .vline-bottom { position: absolute; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, transparent, var(--gold), transparent); z-index: 3; }
+.vline-top { top: 0; } .vline-bottom { bottom: 0; }
+
+/* MOTTO */
+.motto-bar { padding: 3.5rem 0; background: #000; border-top: 4px solid var(--gold); border-bottom: 4px solid var(--gold); position: relative; overflow: hidden; }
+.motto-bar::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse 70% 100% at 50% 50%, rgba(26,124,62,0.1), transparent 70%); }
+.motto-inner { display: flex; align-items: center; justify-content: center; gap: 1.5rem; padding: 0 4vw; position: relative; z-index: 1; }
+.motto-word { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.8rem, 5vw, 5rem); letter-spacing: 0.1em; color: #fff; white-space: nowrap; }
+.motto-dot { width: 10px; height: 10px; background: var(--gold); border-radius: 50%; flex-shrink: 0; box-shadow: 0 0 12px rgba(245,197,24,0.6); }
+
+/* PAGE 2 */
+.page-divider { background: var(--dark-3); border-top: 1px solid rgba(255,255,255,0.04); padding: 3rem 6vw; text-align: center; }
+.page-divider h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2rem,4vw,3.5rem); color: var(--text-dim); letter-spacing: 0.15em; }
+.page-divider h2 span { color: var(--gold); }
+.offer-hero { display: grid; grid-template-columns: 1fr 1fr; min-height: 80vh; align-items: stretch; overflow: hidden; }
+.offer-img { position: relative; overflow: hidden; }
+.offer-img img { width: 100%; height: 100%; min-height: 500px; object-fit: cover; object-position: center 20%; display: block; filter: contrast(1.1) saturate(1.15); }
+.offer-img::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to left, var(--dark-2) 0%, rgba(15,23,16,0.2) 40%, transparent 65%); }
+.offer-content { background: var(--dark-2); padding: 5rem 5vw 5rem 4vw; display: flex; flex-direction: column; justify-content: center; border-left: 1px solid rgba(34,168,85,0.12); }
+.offer-content h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(2.2rem,3.5vw,3.5rem); line-height: 0.95; margin-bottom: 2rem; }
+.offer-list { list-style: none; display: flex; flex-direction: column; gap: 1.5rem; margin-bottom: 2.5rem; }
+.offer-item { display: flex; gap: 1rem; align-items: flex-start; opacity: 0; transform: translateX(16px); transition: all 0.5s; }
+.offer-item.visible { opacity: 1; transform: translateX(0); }
+.offer-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 0.1rem; }
+.offer-item h3 { font-family: 'Barlow Condensed', sans-serif; font-size: 1.05rem; font-weight: 700; letter-spacing: 0.06em; color: var(--gold); text-transform: uppercase; margin-bottom: 0.25rem; }
+.offer-item p { font-size: 0.85rem; color: var(--text-dim); line-height: 1.6; font-weight: 300; }
+.availability-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: var(--green-bright); border-top: 1px solid rgba(34,168,85,0.2); padding-top: 1.5rem; }
+.availability-tag strong { display: block; font-family: 'Bebas Neue', sans-serif; font-size: 1.1rem; color: var(--text-dim); letter-spacing: 0.08em; margin-bottom: 0.2rem; }
+.final-cta { padding: 6rem 6vw; text-align: center; background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(26,124,62,0.09), transparent 70%), var(--dark); position: relative; }
+.final-cta::before { content: ''; position: absolute; top: 0; left: 8%; right: 8%; height: 1px; background: linear-gradient(90deg, transparent, var(--gold), transparent); }
+.final-cta h2 { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem,7vw,6rem); line-height: 0.9; margin-bottom: 1.2rem; }
+.final-cta .sub { font-family: 'Barlow Condensed', sans-serif; font-size: 0.85rem; letter-spacing: 0.22em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 2.5rem; }
+.big-number { font-family: 'Bebas Neue', sans-serif; font-size: clamp(3rem,7vw,6rem); color: var(--gold); letter-spacing: 0.1em; text-shadow: 0 0 40px rgba(245,197,24,0.25); margin-bottom: 0.5rem; }
+.channel-note { font-family: 'Barlow Condensed', sans-serif; font-size: 0.8rem; letter-spacing: 0.25em; color: var(--text-dim); text-transform: uppercase; margin-bottom: 2rem; }
+.slots-pill { display: inline-block; background: rgba(245,197,24,0.08); border: 1px solid rgba(245,197,24,0.3); color: var(--gold); font-family: 'Barlow Condensed', sans-serif; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; padding: 0.5rem 1.4rem; }
+footer { background: var(--dark-3); border-top: 1px solid rgba(255,255,255,0.05); padding: 1.6rem 6vw; display: flex; justify-content: space-between; align-items: center; font-family: 'Barlow Condensed', sans-serif; font-size: 0.72rem; letter-spacing: 0.18em; color: var(--text-dim); text-transform: uppercase; }
+
+@keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+@media (max-width: 700px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-right { display: none; }
+  .hero-left { padding: 3rem 5vw; }
+  .stats-bar { grid-template-columns: repeat(2,1fr); }
+  .creds { grid-template-columns: 1fr; gap: 2.5rem; }
+  .portrait-wrap { display: none; }
+  .video-section { height: 60vh; }
+  .offer-hero { grid-template-columns: 1fr; }
+  .offer-img { min-height: 55vw; }
+  .motto-inner { gap: 0.8rem; }
+  .motto-word { font-size: clamp(1.8rem,7vw,3rem); letter-spacing: 0.05em; }
+  footer { flex-direction: column; gap: 0.4rem; text-align: center; }
+}
+</style>
+</head>
+<body>
+<canvas id="ball-canvas"></canvas>
+
+<section class="hero">
+  <div class="hero-left">
+    <p class="eyebrow">SA National Champion · World Championships Athlete</p>
+    <h1>TRAIN<br>WITH THE<br><span class="outline">BEST.</span></h1>
+    <p class="hero-sub">Elite Table Tennis Coaching — All Ages &amp; All Levels</p>
+    <div class="hero-badges">
+      <span class="badge gold">🏆 SA National Champion</span>
+      <span class="badge">🌍 Commonwealth Games</span>
+      <span class="badge">🏓 ITTF World Championships</span>
+      <span class="badge">5× African Championships</span>
+    </div>
+    <div class="contact-block">
+      <div class="contact-label">WhatsApp or Call to Book</div>
+      <div class="contact-number">072 444 6139</div>
+      <div class="contact-channels">WhatsApp · Call · Limited slots available</div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="IMG_0014.jpeg" alt="Coach in action">
+    <div class="world-tag">
+      <div class="wt-title">ITTF World Championships</div>
+      <div class="wt-sub">London · South Africa</div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS: 1x = gold bold, rest = green -->
+<div class="stats-bar">
+  <div class="stat">
+    <div class="stat-number gold">1×</div>
+    <div class="stat-label">SA National Champion</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number green">5×</div>
+    <div class="stat-label">African Championships</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number green">2×</div>
+    <div class="stat-label">All-African Games</div>
+  </div>
+  <div class="stat">
+    <div class="stat-number green">4×</div>
+    <div class="stat-label">Zone 5 Regional Championships</div>
+  </div>
+</div>
+
+<section class="creds">
+  <div>
+    <p class="section-label">Career Highlights</p>
+    <h2>BUILT AT THE HIGHEST LEVEL</h2>
+    <div class="timeline">
+      <div class="titem"><div class="tdot"></div><div><strong>ITTF World Team Championships — London</strong><span>Most recently represented South Africa on the world stage</span></div></div>
+      <div class="titem"><div class="tdot"></div><div><strong>Commonwealth Games — Birmingham</strong><span>Competed at the world's most prestigious multi-sport event</span></div></div>
+      <div class="titem"><div class="tdot"></div><div><strong>World Championships — Durban</strong><span>ITTF World-level representation for South Africa</span></div></div>
+      <div class="titem"><div class="tdot"></div><div><strong>Multiple SA Doubles &amp; Mixed Doubles Champion</strong><span>Dominant force in South African table tennis</span></div></div>
+      <div class="titem"><div class="tdot"></div><div><strong>5× Senior African Championships · 2× All-African Games</strong><span>Elite continental experience across the full career</span></div></div>
+      <div class="titem"><div class="tdot"></div><div><strong>African Cup — Top 16</strong><span>Ranked among the continent's best in open competition</span></div></div>
+    </div>
+  </div>
+  <div class="portrait-wrap">
+    <img src="IMG_0015.jpeg" alt="Coach portrait">
+    <div class="portrait-label">SA National Champion</div>
+  </div>
+</section>
+
+<!-- CINEMATIC VIDEO — zoomed out, player visible -->
+<section class="video-section" id="videoSection">
+  <div class="vline-top"></div>
+  <video id="bgVideo" muted loop playsinline preload="auto">
+    <source src="chetan_nike.mp4" type="video/mp4">
+  </video>
+  <div class="video-overlay">
+    <div class="vo-label">In the Arena</div>
+    <div class="vo-title">PURE<br><span>CHAMPION</span></div>
+    <div class="vo-sub">Power · Precision · Passion</div>
+  </div>
+  <div class="vline-bottom"></div>
+</section>
+
+<div class="motto-bar">
+  <div class="motto-inner">
+    <span class="motto-word">POWER</span>
+    <div class="motto-dot"></div>
+    <span class="motto-word">PASSION</span>
+    <div class="motto-dot"></div>
+    <span class="motto-word">PERFORMANCE</span>
+  </div>
+</div>
+
+<div class="page-divider"><h2>TRAIN WITH A <span>CHAMPION</span></h2></div>
+
+<section class="offer-hero">
+  <div class="offer-img">
+    <img src="4ad8205c-8a3b-47c5-aa83-de200cdeb50f_Original.jpeg" alt="Coach celebrating">
+  </div>
+  <div class="offer-content">
+    <p class="section-label">What You'll Get</p>
+    <h2>COACHING THAT <span style="color:var(--green-bright)">ELEVATES</span> YOUR GAME</h2>
+    <ul class="offer-list">
+      <li class="offer-item"><span class="offer-icon">🎯</span><div><h3>Elite-Level Coaching</h3><p>Train with methods used at international level — the same approach that reached the Commonwealth Games and World Championships.</p></div></li>
+      <li class="offer-item"><span class="offer-icon">📋</span><div><h3>Personalized Training Plans</h3><p>No generic drills. Every session is built around your level, your goals, and your style of play.</p></div></li>
+      <li class="offer-item"><span class="offer-icon">🧠</span><div><h3>Match Strategy &amp; Mental Game</h3><p>Tactical reading, pressure management, and decisions that separate good players from great ones.</p></div></li>
+      <li class="offer-item"><span class="offer-icon">💪</span><div><h3>Strength &amp; Conditioning</h3><p>Sport-specific training to sharpen speed, reflexes, and stamina on and off the table.</p></div></li>
+    </ul>
+    <div class="availability-tag">
+      <strong>All Ages · All Levels</strong>
+      ⚡ Limited slots available — contact to book
+    </div>
+  </div>
+</section>
+
+<section class="final-cta">
+  
+  <h2>READY TO <span style="color:var(--green-bright)">SERVE?</span></h2>
+  <p class="sub">All ages · All levels · Real results</p>
+  <div class="big-number">072 444 6139</div>
+  <div class="channel-note">WhatsApp or Call to Book Your Session</div>
+  <div class="slots-pill">⚡ Limited coaching slots — secure yours now</div>
+</section>
+
+<footer>
+  <span>Chetan Coaching</span>
+  <span>Power · Passion · Performance</span>
+  <span>072 444 6139</span>
+</footer>
+
+<script>
+const canvas = document.getElementById('ball-canvas');
+const ctx = canvas.getContext('2d');
+let W, H, balls;
+function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+function makeBall() {
+  const speed = 1.2+Math.random()*2, angle = Math.random()*Math.PI*2;
+  return {x:Math.random()*W,y:Math.random()*H,r:4+Math.random()*6,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,trail:[],color:Math.random()>0.5?'#22a855':'#f5c518'};
+}
+function init() { resize(); balls = Array.from({length:5}, makeBall); }
+function draw() {
+  ctx.clearRect(0,0,W,H);
+  balls.forEach(b => {
+    b.trail.push({x:b.x,y:b.y});
+    if(b.trail.length>14) b.trail.shift();
+    b.trail.forEach((pt,i) => {
+      ctx.beginPath(); ctx.arc(pt.x,pt.y,b.r*(i/b.trail.length),0,Math.PI*2);
+      ctx.fillStyle=b.color+Math.floor((i/b.trail.length)*180).toString(16).padStart(2,'0'); ctx.fill();
+    });
+    ctx.beginPath(); ctx.arc(b.x,b.y,b.r,0,Math.PI*2); ctx.fillStyle=b.color; ctx.fill();
+    b.x+=b.vx; b.y+=b.vy;
+    if(b.x-b.r<0||b.x+b.r>W) b.vx*=-1;
+    if(b.y-b.r<0||b.y+b.r>H) b.vy*=-1;
+  });
+  requestAnimationFrame(draw);
+}
+window.addEventListener('resize', resize);
+init(); draw();
+
+const videoSection = document.getElementById('videoSection');
+const bgVideo = document.getElementById('bgVideo');
+const videoObs = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      videoSection.classList.add('in-view');
+      bgVideo.play().then(() => bgVideo.classList.add('playing')).catch(()=>{});
+    } else {
+      bgVideo.pause();
+      bgVideo.classList.remove('playing');
+      videoSection.classList.remove('in-view');
+    }
+  });
+}, {threshold: 0.2});
+videoObs.observe(videoSection);
+
+const obs = new IntersectionObserver((entries) => {
+  entries.forEach((e,i) => { if(e.isIntersecting) setTimeout(()=>e.target.classList.add('visible'),i*100); });
+},{threshold:0.15});
+document.querySelectorAll('.stat,.titem,.offer-item').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>
